@@ -2,84 +2,98 @@ import os
 import json
 from enum import Enum
 
+
 class Prioridade(Enum):
     BAIXA = "baixa"
     MEDIA = "media"
     ALTA = "alta"
 
+
 def inserir(tarefa_titulo):
 
     prioridade = perguntar_prioridade()
-    if prioridade is None: 
+    if prioridade is None:
         return
-    
+
     nova_tarefa = {
         "titulo": tarefa_titulo,
         "prioridade": prioridade.value,
-        "status": "pendente"
+        "status": "pendente",
     }
-    
+
     escrever_arquivo(nova_tarefa)
-    print(f'A tarefa "{nova_tarefa['titulo']}" com a prioridade "{nova_tarefa["prioridade"]}" foi adicionada!')
+    print(
+        f'A tarefa "{nova_tarefa["titulo"]}" com a prioridade "{nova_tarefa["prioridade"]}" foi adicionada!'
+    )
+
+
 def apagar():
-    apagar_tarefa() 
+    apagar_tarefa()
+
 
 def checar_sair(input):
-    if input.lower().find('sair') == 0:
+    if input.lower().find("sair") == 0:
         limpar_tela()
-        print('Até mais!')
+        print("Até mais!")
         return True
     return False
+
+
 def editar():
-    print('editar...WIP') 
+    print("editar...WIP")
+
 
 def exibir():
-    print('Aqui está a sua atual lista de tarefas:')
-    exibir_tarefas() 
-
+    print("Aqui está a sua atual lista de tarefas:")
+    exibir_tarefas()
 
 
 def perguntar_opcoes_e_retornar_opcao(lista_opcoes):
     while True:
-        print('-Opções disponíveis-')
+        print("-Opções disponíveis-")
         for opcao in lista_opcoes:
-            print(f'{opcao['id']}. {opcao['nome']}')
+            print(f"{opcao['id']}. {opcao['nome']}")
         try:
-            opcao_desejada = input('Opção: ')
+            opcao_desejada = input("Opção: ")
             opcao_desejada = abs(int(opcao_desejada))
-            return str(lista_opcoes[opcao_desejada-1]['id'])
+            return str(lista_opcoes[opcao_desejada - 1]["id"])
         except IndexError:
             limpar_tela()
-            print('Opção digitada inválida, tente novamente. :)')
+            print("Opção digitada inválida, tente novamente. :)")
         except ValueError:
             return opcao_desejada
-def limpar_tela(): 
-    os.system('cls')
+
+
+def limpar_tela():
+    os.system("cls")
+
 
 def ler_arquivo() -> list:
     try:
-        with open('tarefas.json', 'r', encoding='utf-8') as arquivo_tarefas_json:
-           return json.load(arquivo_tarefas_json)
+        with open("tarefas.json", "r", encoding="utf-8") as arquivo_tarefas_json:
+            return json.load(arquivo_tarefas_json)
     except (json.JSONDecodeError, FileNotFoundError):
         return []
-    
+
+
 def exibir_tarefas():
     lista_tarefas = ler_arquivo()
     for indice, tarefa in enumerate(lista_tarefas):
-        print(indice+1, tarefa['titulo'])
+        print(indice + 1, tarefa["titulo"])
     print()
-        
+
+
 def apagar_tarefa():
     while True:
         lista_tarefas = ler_arquivo()
         exibir_tarefas()
-        indice_tarefa = input('Digite o índice da tarefa que será apagada: ')
-        if checar_sair(indice_tarefa): 
+        indice_tarefa = input("Digite o índice da tarefa que será apagada: ")
+        if checar_sair(indice_tarefa):
             break
         try:
-            indice_tarefa = abs(int(indice_tarefa))-1
+            indice_tarefa = abs(int(indice_tarefa)) - 1
         except ValueError:
-            print('Digita um número ai, carai')
+            print("Digita um número ai, carai")
             continue
         try:
             tarefa_removida = lista_tarefas.pop(indice_tarefa)
@@ -87,24 +101,25 @@ def apagar_tarefa():
             print('Você digitou um número, mas não o certo. ¬_¬"')
             continue
         limpar_tela()
-        escrever_arquivo(lista_tarefas) 
-        print(f'A tarefa "{tarefa_removida['titulo']}" foi removida!')
+        escrever_arquivo(lista_tarefas)
+        print(f'A tarefa "{tarefa_removida["titulo"]}" foi removida!')
         break
 
-        
+
 def perguntar_prioridade():
     while True:
         resposta = input("Prioridade [a]lta, [m]édia, [b]aixa: ").lower()
         limpar_tela()
-        if checar_sair(resposta): 
+        if checar_sair(resposta):
             break
-        if resposta in ['a', 'alta']:
+        if resposta in ["a", "alta"]:
             return Prioridade.ALTA
-        elif resposta in ['m', 'media', 'média']:
+        elif resposta in ["m", "media", "média"]:
             return Prioridade.MEDIA
-        elif resposta in ['b', 'baixa']:
+        elif resposta in ["b", "baixa"]:
             return Prioridade.BAIXA
         print("Opção inválida!")
+
 
 def escrever_arquivo(tarefa_ou_lista):
     lista_tarefas_arquivo = ler_arquivo()
@@ -112,6 +127,6 @@ def escrever_arquivo(tarefa_ou_lista):
         lista_tarefas_arquivo.append(tarefa_ou_lista)
     else:
         lista_tarefas_arquivo = tarefa_ou_lista
-        
-    with open('tarefas.json', 'w', encoding='utf-8') as arquivo_tarefas:
+
+    with open("tarefas.json", "w", encoding="utf-8") as arquivo_tarefas:
         json.dump(lista_tarefas_arquivo, arquivo_tarefas, indent=4, ensure_ascii=False)
