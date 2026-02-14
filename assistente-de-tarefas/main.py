@@ -4,6 +4,7 @@ lista_opcoes = [
     {"id": 1, "nome": "apagar", "funcao": funcoes.apagar},
     {"id": 2, "nome": "editar", "funcao": funcoes.editar},
     {"id": 3, "nome": "exibir", "funcao": funcoes.exibir},
+    {"id": 4, "nome": "avançar situação", "funcao": funcoes.avancar},
 ]
 
 while True:
