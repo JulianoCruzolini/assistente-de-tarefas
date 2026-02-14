@@ -8,6 +8,7 @@ class Prioridade(Enum):
     MEDIA = "media"
     ALTA = "alta"
 
+lista_situacoes = ["pendente", "em progresso", "concluído"]
 
 def inserir(tarefa_titulo):
 
@@ -18,7 +19,7 @@ def inserir(tarefa_titulo):
     nova_tarefa = {
         "titulo": tarefa_titulo,
         "prioridade": prioridade.value,
-        "situacao": "pendente",
+        "situacao": lista_situacoes[0]
     }
 
     escrever_arquivo(nova_tarefa)
@@ -39,16 +40,16 @@ def checar_sair(input):
     return False
 
 
-def editar():
-    ...
+def editar(): ...
+
 
 def avancar():
     avancar_situacao_tarefa()
 
 
 def exibir():
-    print("Aqui está a sua atual lista de tarefas:")
     exibir_tarefas()
+
 
 def avancar_situacao_tarefa():
     while True:
@@ -62,15 +63,21 @@ def avancar_situacao_tarefa():
         except ValueError:
             print("Digita um número ai, carai")
             continue
+        limpar_tela()
         try:
-            tarefa = lista_tarefas[indice_tarefa]
-            print(f'Entendi que você quer editar a: {tarefa["titulo"]}')
+            for indice, situacao in enumerate(lista_situacoes):
+                if situacao == lista_tarefas[indice_tarefa]['situacao']:
+                    if situacao != lista_situacoes[-1]:
+                        lista_tarefas[indice_tarefa]['situacao'] = lista_situacoes[indice+1]
+                        escrever_arquivo(lista_tarefas)
+                        print(f'A tarefa "{lista_tarefas[indice_tarefa]["titulo"]}" foi avançada!')
+                        return
+                    else:
+                        print(f'A tarefa "{lista_tarefas[indice_tarefa]["titulo"]}" já está concluída!')
+
         except IndexError:
             print('Você digitou um número, mas não o certo. ¬_¬"')
             continue
-        escrever_arquivo(lista_tarefas)
-        print(f'A tarefa "{tarefa["titulo"]}" foi editada!')
-        break 
 
 
 def perguntar_opcoes_e_retornar_opcao(lista_opcoes):
@@ -103,14 +110,18 @@ def ler_arquivo() -> list:
 
 def exibir_tarefas():
     lista_tarefas = ler_arquivo()
-    
+
     indice_maior_tamanho = len(str(len(lista_tarefas)))
     titulo_maior_tamanho = max(len(t["titulo"]) for t in lista_tarefas)
-    #prioridade_maior_tamanho = max(len(t["prioridade"]) for t in lista_tarefas)
+    # prioridade_maior_tamanho = max(len(t["prioridade"]) for t in lista_tarefas)
     situacao_maior_tamanho = max(len(t["situacao"]) for t in lista_tarefas)
-    print(f'{"Indice":<{indice_maior_tamanho+1}}  {"Situacao":<{situacao_maior_tamanho+1}}  {"Título":<{titulo_maior_tamanho+1}}  Prioridade')
+    print(
+        f"{'Indice':<{indice_maior_tamanho + 1}}  {'Situacao':<{situacao_maior_tamanho + 1}}  {'Título':<{titulo_maior_tamanho + 1}}  Prioridade"
+    )
     for indice, tarefa in enumerate(lista_tarefas):
-        print(f'{indice + 1:<{indice_maior_tamanho+6}} {tarefa["situacao"]:<{situacao_maior_tamanho+2}} {tarefa["titulo"]:<{titulo_maior_tamanho+2}} {tarefa["prioridade"].upper()}')
+        print(
+            f"{indice + 1:<{indice_maior_tamanho + 6}} {tarefa['situacao']:<{situacao_maior_tamanho + 2}} {tarefa['titulo']:<{titulo_maior_tamanho + 2}} {tarefa['prioridade'].upper()}"
+        )
     print()
 
 
