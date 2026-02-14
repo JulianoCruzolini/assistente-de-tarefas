@@ -8,7 +8,9 @@ class Prioridade(Enum):
     MEDIA = "media"
     ALTA = "alta"
 
+
 lista_situacoes = ["pendente", "em progresso", "concluído"]
+
 
 def inserir(tarefa_titulo):
 
@@ -19,7 +21,7 @@ def inserir(tarefa_titulo):
     nova_tarefa = {
         "titulo": tarefa_titulo,
         "prioridade": prioridade.value,
-        "situacao": lista_situacoes[0]
+        "situacao": lista_situacoes[0],
     }
 
     escrever_arquivo(nova_tarefa)
@@ -40,6 +42,15 @@ def checar_sair(input):
     return False
 
 
+def checar_numero_positivo(numero):
+    limpar_tela()
+    if numero > 0:
+        return True
+    else:
+        print ("Insira um número positivo\n")
+        return False
+
+
 def editar(): ...
 
 
@@ -48,35 +59,49 @@ def avancar():
 
 
 def exibir():
-    exibir_tarefas()
+    lista_terefas = ler_arquivo()
+    exibir_tarefas(lista_terefas)
 
 
 def avancar_situacao_tarefa():
     while True:
         lista_tarefas = ler_arquivo()
-        exibir_tarefas()
+        lista_tarefas = [t for t in lista_tarefas if t["situacao"] != "concluído"]
+        if len(lista_tarefas) == 0:
+            print("Não tem tarefa para avançar!")
+            break
+
+        exibir_tarefas(lista_tarefas)
         indice_tarefa = input("Digite o índice da tarefa que será avançada: ")
+        limpar_tela()
         if checar_sair(indice_tarefa):
             break
         try:
-            indice_tarefa = abs(int(indice_tarefa)) - 1
+            indice_tarefa = int(indice_tarefa)
         except ValueError:
-            print("Digita um número ai, carai")
+            print("Insira um número\n")
             continue
-        limpar_tela()
+
+        if not checar_numero_positivo(indice_tarefa):
+            continue
+        indice_tarefa-=1
         try:
             for indice, situacao in enumerate(lista_situacoes):
-                if situacao == lista_tarefas[indice_tarefa]['situacao']:
+                if situacao == lista_tarefas[indice_tarefa]["situacao"]:
                     if situacao != lista_situacoes[-1]:
-                        lista_tarefas[indice_tarefa]['situacao'] = lista_situacoes[indice+1]
+                        lista_tarefas[indice_tarefa]["situacao"] = lista_situacoes[indice+1]
                         escrever_arquivo(lista_tarefas)
-                        print(f'A tarefa "{lista_tarefas[indice_tarefa]["titulo"]}" foi avançada!')
+                        print2n(
+                            f'A tarefa "{lista_tarefas[indice_tarefa]["titulo"]}" foi avançada!'
+                        )
                         return
                     else:
-                        print(f'A tarefa "{lista_tarefas[indice_tarefa]["titulo"]}" já está concluída!')
+                        print2n(
+                            f'A tarefa "{lista_tarefas[indice_tarefa]["titulo"]}" já está concluída!'
+                        )
 
         except IndexError:
-            print('Você digitou um número, mas não o certo. ¬_¬"')
+            print2n('Você digitou um número, mas não o certo. ¬_¬\n"')
             continue
 
 
@@ -87,11 +112,13 @@ def perguntar_opcoes_e_retornar_opcao(lista_opcoes):
             print(f"{opcao['id']}. {opcao['nome']}")
         try:
             opcao_desejada = input("Opção: ")
-            opcao_desejada = abs(int(opcao_desejada))
+            opcao_desejada = int(opcao_desejada)
+            if not checar_numero_positivo(opcao_desejada):
+                continue
             return str(lista_opcoes[opcao_desejada - 1]["id"])
         except IndexError:
             limpar_tela()
-            print("Opção digitada inválida, tente novamente. :)")
+            print2n("Opção digitada inválida, tente novamente. :)")
         except ValueError:
             return opcao_desejada
 
@@ -108,8 +135,27 @@ def ler_arquivo() -> list:
         return []
 
 
-def exibir_tarefas():
+def exibir_tarefas(lista_tarefas):
+
+    indice_maior_tamanho = len(str(len(lista_tarefas)))
+    titulo_maior_tamanho = max(len(t["titulo"]) for t in lista_tarefas)
+    # prioridade_maior_tamanho = max(len(t["prioridade"]) for t in lista_tarefas)
+    situacao_maior_tamanho = max(len(t["situacao"]) for t in lista_tarefas)
+    print(
+        f"{'Indice':<{indice_maior_tamanho + 1}}  {'Situacao':<{situacao_maior_tamanho + 1}}  {'Título':<{titulo_maior_tamanho + 1}}  Prioridade"
+    )
+    for indice, tarefa in enumerate(lista_tarefas):
+        print2n(
+            f"{indice + 1:<{indice_maior_tamanho + 6}} {tarefa['situacao']:<{situacao_maior_tamanho + 2}} {tarefa['titulo']:<{titulo_maior_tamanho + 2}} {tarefa['prioridade'].upper()}"
+        )
+
+
+def exibir_tarefas_a_concluir():
     lista_tarefas = ler_arquivo()
+    lista_tarefas_a_concluir = [
+        t for t in lista_tarefas if t["situacao"] != "concluído"
+    ]
+    print("print a concluir", lista_tarefas_a_concluir)
 
     indice_maior_tamanho = len(str(len(lista_tarefas)))
     titulo_maior_tamanho = max(len(t["titulo"]) for t in lista_tarefas)
@@ -124,28 +170,34 @@ def exibir_tarefas():
         )
     print()
 
+def print2n(texto):
+    print(texto, end='\n\n')
+
 
 def apagar_tarefa():
     while True:
         lista_tarefas = ler_arquivo()
-        exibir_tarefas()
+        exibir_tarefas(lista_tarefas)
         indice_tarefa = input("Digite o índice da tarefa que será apagada: ")
+        limpar_tela()
         if checar_sair(indice_tarefa):
             break
         try:
-            indice_tarefa = abs(int(indice_tarefa)) - 1
+            indice_tarefa = int(indice_tarefa)
+            if not checar_numero_positivo(indice_tarefa):
+                continue
+            indice_tarefa-=1
         except ValueError:
-            print("Digita um número ai, carai")
+            print2n("Digita um número ai, carai")
             continue
         try:
             tarefa_removida = lista_tarefas.pop(indice_tarefa)
         except IndexError:
-            print('Você digitou um número, mas não o certo. ¬_¬"')
+            print2n('Você digitou um número, mas não o certo. ¬_¬"')
             continue
-        limpar_tela()
         escrever_arquivo(lista_tarefas)
-        print(f'A tarefa "{tarefa_removida["titulo"]}" foi removida!')
-        break
+        print2n((f'A tarefa "{tarefa_removida["titulo"]}" foi removida!'))
+        return
 
 
 def perguntar_prioridade():

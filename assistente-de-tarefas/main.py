@@ -1,4 +1,5 @@
 import funcoes
+funcoes.limpar_tela()
 
 lista_opcoes = [
     {"id": 1, "nome": "apagar", "funcao": funcoes.apagar},
@@ -6,7 +7,6 @@ lista_opcoes = [
     {"id": 3, "nome": "exibir", "funcao": funcoes.exibir},
     {"id": 4, "nome": "avançar situação", "funcao": funcoes.avancar},
 ]
-
 while True:
     opcao_desejada = funcoes.perguntar_opcoes_e_retornar_opcao(lista_opcoes)
     if funcoes.checar_sair(opcao_desejada):
@@ -20,8 +20,9 @@ while True:
         continue
     else:
         try:
+            opcao_desejada = int(opcao_desejada) 
             for opcao in lista_opcoes:
-                if int(opcao_desejada) == opcao["id"]:
+                if opcao_desejada == opcao["id"]:
                     opcao["funcao"]()
                     break
         except ValueError:

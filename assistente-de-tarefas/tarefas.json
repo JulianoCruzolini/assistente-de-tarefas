@@ -2,31 +2,6 @@
     {
         "titulo": "lala",
         "prioridade": "alta",
-        "situacao": "concluído"
-    },
-    {
-        "titulo": "lala",
-        "prioridade": "alta",
-        "situacao": "concluído"
-    },
-    {
-        "titulo": "lala",
-        "prioridade": "alta",
-        "situacao": "concluído"
-    },
-    {
-        "titulo": "lala",
-        "prioridade": "alta",
-        "situacao": "concluído"
-    },
-    {
-        "titulo": "lalala",
-        "prioridade": "alta",
-        "situacao": "concluído"
-    },
-    {
-        "titulo": "Caminhar",
-        "prioridade": "alta",
-        "situacao": "concluído"
+        "situacao": "em progresso"
     }
 ]
