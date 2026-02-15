@@ -16,7 +16,7 @@ while True:
     if len(opcao_desejada) > 1:
         funcoes.inserir(opcao_desejada)
     elif len(funcoes.ler_arquivo()) == 0:
-        print("Lista vazia!")
+        funcoes.print2n("Lista vazia!")
         continue
     else:
         try:
@@ -26,4 +26,4 @@ while True:
                     opcao["funcao"]()
                     break
         except ValueError:
-            print("Um caractere só é paia")
+            funcoes.print2n("Um caractere só é paia")
