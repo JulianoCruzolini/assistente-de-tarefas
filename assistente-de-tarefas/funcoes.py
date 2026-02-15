@@ -13,10 +13,11 @@ lista_situacoes = ["pendente", "em progresso", "concluído"]
 
 
 def inserir(tarefa_titulo):
-
-    prioridade = perguntar_prioridade()
-    if prioridade is None:
-        return
+    while True:
+        prioridade = perguntar_prioridade()
+        if prioridade is None:
+            continue
+        break
 
     nova_tarefa = {
         "titulo": tarefa_titulo,
@@ -51,17 +52,61 @@ def checar_numero_positivo(numero):
         return False
 
 
-def editar(): ...
+def editar():
+    editar_tarefa()
 
 
 def avancar():
     avancar_situacao_tarefa()
 
+def buscar():
+    buscar_tarefa()
+
+def buscar_tarefa():
+    ...
 
 def exibir():
     lista_terefas = ler_arquivo()
     exibir_tarefas(lista_terefas)
 
+def editar_tarefa():
+    while True:
+        lista_tarefas = ler_arquivo()
+        exibir_tarefas(lista_tarefas)
+        indice_tarefa = input("\nDigite o índice da tarefa que será editada: ")
+        limpar_tela()
+        if checar_sair(indice_tarefa):
+            break
+        try:
+            indice_tarefa = int(indice_tarefa)
+            if not checar_numero_positivo(indice_tarefa):
+                continue
+            indice_tarefa-=1
+        except ValueError:
+            print2n("Digita um número ai, carai")
+            continue
+        try:
+            print('Nome antigo: ',lista_tarefas[indice_tarefa]["titulo"])
+            print('Prioridade antiga: ',lista_tarefas[indice_tarefa]["prioridade"])
+
+            antigo_nome_tarefa = lista_tarefas[indice_tarefa]["titulo"]
+            antiga_propriedade_tarefa = lista_tarefas[indice_tarefa]["prioridade"]
+
+            novo_nome_tarefa = input('Digite o novo nome da tarefa:')
+            nova_prioridade_tarefa = perguntar_prioridade()
+
+            novo_nome_tarefa = antigo_nome_tarefa if len(novo_nome_tarefa) == 0 else novo_nome_tarefa
+            #nova_prioridade_tarefa = antiga_propriedade_tarefa if nova_prioridade_tarefa is None else nova_prioridade_tarefa
+            nova_prioridade_tarefa = antiga_propriedade_tarefa if nova_prioridade_tarefa is None else nova_prioridade_tarefa.value
+
+            lista_tarefas[indice_tarefa]["titulo"] = novo_nome_tarefa
+            lista_tarefas[indice_tarefa]["prioridade"] = nova_prioridade_tarefa
+        except IndexError:
+            print('Você digitou um número, mas não o certo. ¬_¬"')
+            continue
+        escrever_arquivo(lista_tarefas)
+        print((f'A tarefa "{antigo_nome_tarefa}" foi editada!'))
+        return
 
 def avancar_situacao_tarefa():
     while True:
@@ -204,7 +249,6 @@ def apagar_tarefa():
 def perguntar_prioridade():
     while True:
         resposta = input("Prioridade [a]lta, [m]édia, [b]aixa: ").lower()
-        limpar_tela()
         if checar_sair(resposta):
             break
         if resposta in ["a", "alta"]:
@@ -213,6 +257,8 @@ def perguntar_prioridade():
             return Prioridade.MEDIA
         elif resposta in ["b", "baixa"]:
             return Prioridade.BAIXA
+        elif len(resposta) == 0:
+            return None
         print("Opção inválida!")
 
 
