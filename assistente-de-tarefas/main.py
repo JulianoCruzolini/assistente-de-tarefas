@@ -1,5 +1,6 @@
 import menu
 import utils
+
 utils.limpar_tela()
 
 lista_opcoes = [
@@ -18,4 +19,4 @@ while True:
     if len(opcao_desejada) > 1:
         menu.inserir(opcao_desejada)
         continue
-    lista_opcoes[int(opcao_desejada)-1]["funcao"]()
+    lista_opcoes[int(opcao_desejada) - 1]["funcao"]()

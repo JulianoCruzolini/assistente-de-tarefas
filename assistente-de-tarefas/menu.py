@@ -14,6 +14,7 @@ class Prioridade(Enum):
 RETENTATIVA = "Digite uma das opções abaixo."
 LISTA_SITUACOES = ["pendente", "em progresso", "concluído"]
 
+
 def contar_situacoes():
     lista_tarefas = arquivo.ler_arquivo()
     pendentes = len([t for t in lista_tarefas if t["situacao"] == "pendente"])
@@ -22,7 +23,8 @@ def contar_situacoes():
     print("Pendentes:", pendentes)
     print("Em progresso:", em_progresso)
     utils.print2n(f"Concluídas: {concluidas}")
-    
+
+
 def exibir():
     lista_tarefas = arquivo.ler_arquivo()
     ui.exibir_tarefas(lista_tarefas)
