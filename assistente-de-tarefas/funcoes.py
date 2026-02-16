@@ -38,7 +38,6 @@ def apagar():
 def checar_sair(input):
     if input.lower().find("sair") == 0:
         limpar_tela()
-        print("Até mais!")
         return True
     return False
 
@@ -48,7 +47,6 @@ def checar_numero_positivo(numero):
     if numero > 0:
         return True
     else:
-        print2n("Insira um número positivo")
         return False
 
 
@@ -62,74 +60,109 @@ def avancar():
 def buscar():
     buscar_tarefa()
 
+def filtrar_tarefas_titulo():
+    lista_tarefas = ler_arquivo()
+    palavra = input ('Digite uma palavra: ')
+    limpar_tela()
+    lista_tarefas_titulo = [tarefa for tarefa in lista_tarefas if palavra in tarefa["titulo"]]
+    if len(lista_tarefas_titulo) > 0:
+        exibir_tarefas(lista_tarefas_titulo)
+    else:
+        print2n('Não existem tarefas com essa palavra!')
+
+
+def filtrar_tarefas_prioridade():
+    lista_tarefas = ler_arquivo()
+    prioridade = perguntar_prioridade()
+    limpar_tela()
+    lista_tarefas_prioridade = [tarefa for tarefa in lista_tarefas if tarefa["prioridade"] == prioridade.value]
+    if len(lista_tarefas_prioridade) > 0:
+        exibir_tarefas(lista_tarefas_prioridade)
+    else:
+        print2n('Não existem tarefas com essa prioridade!')
+
+
 def buscar_tarefa():
-    ...
+    lista_opcoes_busca = [
+        {"nome": "Titulo", "funcao": filtrar_tarefas_titulo},
+        {"nome": "Prioridade", "funcao": filtrar_tarefas_prioridade}
+    ]
+    
+    while True:
+        print("Buscar tarefa por:")
+        exibir_opcoes(lista_opcoes_busca)
+        opcao_desejada = input('\nOpção: ')
+        if checar_sair(opcao_desejada):
+            break
+        if not checar_indice(opcao_desejada, lista_opcoes_busca):
+            limpar_tela()
+            print2n('Escolha uma das opções abaixo ')
+            continue
+        lista_opcoes_busca[int(opcao_desejada)-1]["funcao"]()
+
 
 def exibir():
-    lista_terefas = ler_arquivo()
-    exibir_tarefas(lista_terefas)
+    lista_tarefas = ler_arquivo()
+    exibir_tarefas(lista_tarefas)
+
+def checar_indice(indice, lista):
+    return indice in list(map(str, range(1, len(lista)+1)))
 
 def editar_tarefa():
     while True:
         lista_tarefas = ler_arquivo()
         exibir_tarefas(lista_tarefas)
-        indice_tarefa = input("\nDigite o índice da tarefa que será editada: ")
+        indice_tarefa = input("Digite o índice da tarefa que será editada: ")
         limpar_tela()
         if checar_sair(indice_tarefa):
             break
-        try:
-            indice_tarefa = int(indice_tarefa)
-            if not checar_numero_positivo(indice_tarefa):
-                continue
-            indice_tarefa-=1
-        except ValueError:
-            print2n("Digita um número ai, carai")
+
+        if not checar_indice(indice_tarefa, lista_tarefas):
+            print("Digite novamente")
             continue
-        try:
-            print('Nome antigo: ',lista_tarefas[indice_tarefa]["titulo"])
-            print('Prioridade antiga: ',lista_tarefas[indice_tarefa]["prioridade"])
 
-            antigo_nome_tarefa = lista_tarefas[indice_tarefa]["titulo"]
-            antiga_propriedade_tarefa = lista_tarefas[indice_tarefa]["prioridade"]
+        indice_tarefa = int(indice_tarefa)
+        indice_tarefa-=1
+        tarefa = lista_tarefas[indice_tarefa]
 
-            novo_nome_tarefa = input('Digite o novo nome da tarefa:')
-            nova_prioridade_tarefa = perguntar_prioridade()
+        print('Nome antigo:',tarefa["titulo"])
+        print2n(f'Prioridade antiga: {tarefa["prioridade"]}')
 
-            novo_nome_tarefa = antigo_nome_tarefa if len(novo_nome_tarefa) == 0 else novo_nome_tarefa
-            #nova_prioridade_tarefa = antiga_propriedade_tarefa if nova_prioridade_tarefa is None else nova_prioridade_tarefa
-            nova_prioridade_tarefa = antiga_propriedade_tarefa if nova_prioridade_tarefa is None else nova_prioridade_tarefa.value
+        antigo_nome_tarefa = tarefa["titulo"]
+        antiga_propriedade_tarefa = tarefa["prioridade"]
 
-            lista_tarefas[indice_tarefa]["titulo"] = novo_nome_tarefa
-            lista_tarefas[indice_tarefa]["prioridade"] = nova_prioridade_tarefa
-        except IndexError:
-            print('Você digitou um número, mas não o certo. ¬_¬"')
-            continue
-        escrever_arquivo(lista_tarefas)
+        novo_nome_tarefa = input('Digite o novo nome da tarefa: ')
+        print("Digite a nova prioridade da tarefa")
+        nova_prioridade_tarefa = perguntar_prioridade()
+
+        novo_nome_tarefa = antigo_nome_tarefa if len(novo_nome_tarefa) == 0 else novo_nome_tarefa
+        nova_prioridade_tarefa = antiga_propriedade_tarefa if nova_prioridade_tarefa is None else nova_prioridade_tarefa.value
+
+        tarefa["titulo"] = novo_nome_tarefa
+        tarefa["prioridade"] = nova_prioridade_tarefa
+
+        escrever_arquivo([tarefa])
+        limpar_tela()
         print((f'A tarefa "{antigo_nome_tarefa}" foi editada!'))
         return
 
 def avancar_situacao_tarefa():
     while True:
         lista_tarefas = ler_arquivo()
-        lista_tarefas_a_concluir = [t for t in lista_tarefas if t["situacao"] != "concluído"]
-        lista_tarefas_concluida = [t for t in lista_tarefas if t["situacao"] == "concluído"]
+        lista_tarefas_a_concluir = [tarefa for tarefa in lista_tarefas if tarefa["situacao"] != "concluído"]
+        lista_tarefas_concluida = [tarefa for tarefa in lista_tarefas if tarefa["situacao"] == "concluído"]
         if len(lista_tarefas_a_concluir) == 0:
             print("Não tem tarefa para avançar!")
             break
 
         exibir_tarefas(lista_tarefas_a_concluir)
-        indice_tarefa = input("\nDigite o índice da tarefa que será avançada: ")
+        indice_tarefa = input("Digite o índice da tarefa que será avançada: ")
         limpar_tela()
         if checar_sair(indice_tarefa):
             break
-        try:
-            indice_tarefa = int(indice_tarefa)
-        except ValueError:
-            print2n("Insira um número")
+        if not checar_indice(indice_tarefa, lista_tarefas_a_concluir):
             continue
-
-        if not checar_numero_positivo(indice_tarefa):
-            continue
+        indice_tarefa = int(indice_tarefa)
         indice_tarefa-=1
         try:
             for indice, situacao in enumerate(lista_situacoes):
@@ -150,24 +183,55 @@ def avancar_situacao_tarefa():
             print2n('Você digitou um número, mas não o certo. ¬_¬"')
             continue
 
+def exibir_opcoes(lista_opcoes):
+    for indice, opcao in enumerate(lista_opcoes):
+        print(f"{indice+1}. {opcao['nome']}")
+
+def criar_opcao(nome, funcao):
+    return {"nome": nome, "funcao": funcao}
 
 def perguntar_opcoes_e_retornar_opcao(lista_opcoes):
+    """
+    Exibe menu e retorna opção escolhida.
+    
+    Returns:
+        str: ID da opção OU texto para adicionar tarefa
+    """
+    
     while True:
-        print("-Opções disponíveis-")
-        for opcao in lista_opcoes:
-            print(f"{opcao['id']}. {opcao['nome']}")
-        try:
-            opcao_desejada = input("Opção: ")
-            opcao_desejada = int(opcao_desejada)
-            if not checar_numero_positivo(opcao_desejada):
+        # Exibe menu
+        print("--- Menu ---")
+        exibir_opcoes(lista_opcoes)
+       
+        
+        # Pede entrada
+        entrada = input("\nOpção: ").strip()
+        limpar_tela()
+        
+        # Valida vazio
+        if not entrada:
+            print2n("❌ Digite algo!")
+            continue
+        
+        # Valida negativo
+        if entrada.startswith('-'):
+            print2n("❌ Números negativos não são permitidos!")
+            continue
+        
+        # Se é número puro (digitos)
+        if entrada.isdigit():
+            if checar_indice(entrada, lista_opcoes):
+                return entrada  # Opção válida
+            else:
+                print2n(f"❌ Opção {entrada} não existe!")
                 continue
-            return str(lista_opcoes[opcao_desejada - 1]["id"])
-        except IndexError:
-            limpar_tela()
-            print("Opção digitada inválida, tente novamente. :)")
-        except ValueError:
-            return opcao_desejada
-
+        
+        # Se é texto
+        if len(entrada) > 1:
+            return entrada  # Adicionar tarefa
+        
+        # 1 letra inválida
+        print2n("⚠️ Digite número do menu ou texto para tarefa!")
 
 def limpar_tela():
     os.system("cls")
@@ -194,6 +258,7 @@ def exibir_tarefas(lista_tarefas):
         print(
             f"{indice + 1:<{indice_maior_tamanho + 6}} {tarefa['situacao']:<{situacao_maior_tamanho + 2}} {tarefa['titulo']:<{titulo_maior_tamanho + 2}} {tarefa['prioridade'].upper()}"
         )
+    print()
 
 
 def exibir_tarefas_a_concluir():
@@ -224,23 +289,15 @@ def apagar_tarefa():
     while True:
         lista_tarefas = ler_arquivo()
         exibir_tarefas(lista_tarefas)
-        indice_tarefa = input("\nDigite o índice da tarefa que será apagada: ")
+        indice_tarefa = input("Digite o índice da tarefa que será apagada: ")
         limpar_tela()
         if checar_sair(indice_tarefa):
             break
-        try:
-            indice_tarefa = int(indice_tarefa)
-            if not checar_numero_positivo(indice_tarefa):
-                continue
-            indice_tarefa-=1
-        except ValueError:
-            print2n("Digita um número ai, carai")
+        if not checar_indice(indice_tarefa, lista_tarefas):
             continue
-        try:
-            tarefa_removida = lista_tarefas.pop(indice_tarefa)
-        except IndexError:
-            print('Você digitou um número, mas não o certo. ¬_¬"')
-            continue
+        indice_tarefa = int(indice_tarefa)
+        indice_tarefa -= 1
+        tarefa_removida = lista_tarefas.pop(indice_tarefa)
         escrever_arquivo(lista_tarefas)
         print((f'A tarefa "{tarefa_removida["titulo"]}" foi removida!'))
         return
@@ -248,7 +305,7 @@ def apagar_tarefa():
 
 def perguntar_prioridade():
     while True:
-        resposta = input("Prioridade [a]lta, [m]édia, [b]aixa: ").lower()
+        resposta = input("Prioridade - [a]lta, [m]édia, [b]aixa\nResposta: ").lower()
         if checar_sair(resposta):
             break
         if resposta in ["a", "alta"]:
