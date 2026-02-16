@@ -7,7 +7,7 @@ lista_opcoes = [
     {"nome": "editar", "funcao": menu.editar},
     {"nome": "exibir", "funcao": menu.exibir},
     {"nome": "avançar situação", "funcao": menu.avancar},
-    {"nome": "contar situação das tarefas", "funcao": menu.buscar},
+    {"nome": "contar situação das tarefas", "funcao": menu.contar_situacoes},
     {"nome": "buscar tarefas", "funcao": menu.buscar},
 ]
 

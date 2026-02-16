@@ -1,5 +1,4 @@
 import os
-import arquivo
 import menu
 
 
@@ -29,15 +28,13 @@ def print2n(texto):
     print(texto, end="\n\n")
 
 
-def filtrar_tarefas_titulo():
-    lista_tarefas = arquivo.ler_arquivo()
+def filtrar_tarefas_titulo(lista_tarefas):
     palavra = input("Digite uma palavra: ")
     limpar_tela()
     return [tarefa for tarefa in lista_tarefas if palavra in tarefa["titulo"]]
 
 
-def filtrar_tarefas_prioridade():
-    lista_tarefas = arquivo.ler_arquivo()
+def filtrar_tarefas_prioridade(lista_tarefas):
     prioridade = menu.perguntar_prioridade()
     limpar_tela()
     return [tarefa for tarefa in lista_tarefas if tarefa["prioridade"] == prioridade.value]

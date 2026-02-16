@@ -12,9 +12,17 @@ class Prioridade(Enum):
 
 
 RETENTATIVA = "Digite uma das opções abaixo."
-lista_situacoes = ["pendente", "em progresso", "concluído"]
+LISTA_SITUACOES = ["pendente", "em progresso", "concluído"]
 
-
+def contar_situacoes():
+    lista_tarefas = arquivo.ler_arquivo()
+    pendentes = len([t for t in lista_tarefas if t["situacao"] == "pendente"])
+    em_progresso = len([t for t in lista_tarefas if t["situacao"] == "em progresso"])
+    concluidas = len([t for t in lista_tarefas if t["situacao"] == "concluído"])
+    print("Pendentes:", pendentes)
+    print("Em progresso:", em_progresso)
+    utils.print2n(f"Concluídas: {concluidas}")
+    
 def exibir():
     lista_tarefas = arquivo.ler_arquivo()
     ui.exibir_tarefas(lista_tarefas)
@@ -25,46 +33,32 @@ def editar():
 
 
 def perguntar_opcoes_e_retornar_opcao(lista_opcoes):
-    """
-    Exibe menu e retorna opção escolhida.
-
-    Returns:
-        str: ID da opção OU texto para adicionar tarefa
-    """
-
     while True:
-        # Exibe menu
         print("--- Menu ---")
         ui.exibir_opcoes(lista_opcoes)
 
-        # Pede entrada
         entrada = input("\nOpção: ").strip()
         utils.limpar_tela()
 
-        # Valida vazio
         if not entrada:
             utils.print2n("❌ Digite algo!")
             continue
 
-        # Valida negativo
         if entrada.startswith("-"):
             utils.print2n("❌ Números negativos não são permitidos!")
             continue
 
-        # Se é número puro (digitos)
         if entrada.isdigit():
             if utils.checar_indice(entrada, lista_opcoes):
-                return entrada  # Opção válida
+                return entrada
             else:
                 utils.print2n(f"❌ Opção {entrada} não existe!")
                 continue
 
-        # Se é texto
         if len(entrada) > 1:
-            return entrada  # Adicionar tarefa
+            return entrada
 
-        # 1 letra inválida
-        utils.print2n("⚠️ Digite número do menu ou texto para tarefa!")
+        utils.print2n("Digite número do menu ou texto para tarefa!")
 
 
 def perguntar_prioridade():
@@ -89,10 +83,10 @@ def avancar_situacao_tarefa():
         lista_tarefas = arquivo.ler_arquivo()
         lista_tarefas_a_concluir = [tarefa for tarefa in lista_tarefas if tarefa["situacao"] != "concluído"]
         lista_tarefas_concluida = [tarefa for tarefa in lista_tarefas if tarefa["situacao"] == "concluído"]
-        if len(lista_tarefas_a_concluir) == 0:
+        if utils.checar_lista_vazia(lista_tarefas_a_concluir):
+            utils.limpar_tela()
             print("Não tem tarefa para avançar!")
             break
-
         ui.exibir_tarefas(lista_tarefas_a_concluir)
         indice_tarefa = input("Digite o índice da tarefa que será avançada: ")
         utils.limpar_tela()
@@ -101,22 +95,14 @@ def avancar_situacao_tarefa():
         if not utils.checar_indice(indice_tarefa, lista_tarefas_a_concluir):
             utils.print2n(RETENTATIVA)
             continue
-        indice_tarefa = int(indice_tarefa)
-        indice_tarefa -= 1
-        try:
-            for indice, situacao in enumerate(lista_situacoes):
-                if situacao == lista_tarefas_a_concluir[indice_tarefa]["situacao"]:
-                    if situacao != lista_situacoes[-1]:
-                        lista_tarefas_a_concluir[indice_tarefa]["situacao"] = lista_situacoes[indice + 1]
-                        arquivo.escrever_arquivo(lista_tarefas_a_concluir + lista_tarefas_concluida)
-                        utils.print2n(f'A tarefa "{lista_tarefas_a_concluir[indice_tarefa]["titulo"]}" foi avançada!')
-                        return
-                    else:
-                        utils.print2n(f'A tarefa "{lista_tarefas_a_concluir[indice_tarefa]["titulo"]}" já está concluída!')
-
-        except IndexError:
-            utils.print2n('Você digitou um número, mas não o certo. ¬_¬"')
-            continue
+        indice_tarefa = int(indice_tarefa) - 1
+        tarefa_a_concluir = lista_tarefas_a_concluir[indice_tarefa]
+        indice_atual = LISTA_SITUACOES.index(tarefa_a_concluir["situacao"])
+        lista_tarefas_a_concluir[indice_tarefa]["situacao"] = LISTA_SITUACOES[indice_atual + 1]
+        lista_completa = lista_tarefas_a_concluir + lista_tarefas_concluida
+        arquivo.escrever_arquivo(lista_completa)
+        utils.print2n(f'Tarefa "{tarefa_a_concluir["titulo"]}" avançada!')
+        return
 
 
 def avancar():
@@ -159,7 +145,6 @@ def editar_tarefa():
             return
         print("Digite a nova prioridade da tarefa")
         nova_prioridade_tarefa = perguntar_prioridade()
-        print(nova_prioridade_tarefa)
 
         novo_nome_tarefa = antigo_nome_tarefa if len(novo_nome_tarefa) == 0 else novo_nome_tarefa
         nova_prioridade_tarefa = antiga_propriedade_tarefa if nova_prioridade_tarefa is None else nova_prioridade_tarefa.value
@@ -186,7 +171,7 @@ def inserir(tarefa_titulo):
     nova_tarefa = {
         "titulo": tarefa_titulo,
         "prioridade": prioridade.value,
-        "situacao": lista_situacoes[0],
+        "situacao": LISTA_SITUACOES[0],
     }
 
     arquivo.escrever_arquivo(nova_tarefa)
@@ -198,7 +183,9 @@ def buscar_tarefa():
         {"nome": "Titulo", "funcao": utils.filtrar_tarefas_titulo},
         {"nome": "Prioridade", "funcao": utils.filtrar_tarefas_prioridade},
     ]
-
+    lista_tarefas = arquivo.ler_arquivo()
+    if utils.checar_lista_vazia(lista_tarefas):
+        return
     while True:
         print("Buscar tarefa por:")
         ui.exibir_opcoes(lista_opcoes_busca)
@@ -209,11 +196,11 @@ def buscar_tarefa():
             utils.limpar_tela()
             utils.print2n(RETENTATIVA)
             continue
-        lista_tarefas_filtradas = lista_opcoes_busca[int(opcao_desejada) - 1]["funcao"]()
+        lista_tarefas_filtradas = lista_opcoes_busca[int(opcao_desejada) - 1]["funcao"](lista_tarefas)
         if len(lista_tarefas_filtradas) > 0:
             ui.exibir_tarefas(lista_tarefas_filtradas)
         else:
-            utils.print2n("Não existem tarefas com essa palavra!")
+            utils.print2n("Tarefas não encontradas!")
 
 
 def apagar_tarefa():
@@ -229,7 +216,7 @@ def apagar_tarefa():
         if not utils.checar_indice(indice_tarefa, lista_tarefas):
             utils.print2n(RETENTATIVA)
             continue
-        break
-    tarefa_removida = lista_tarefas.pop(int(indice_tarefa) - 1)
-    arquivo.escrever_arquivo(lista_tarefas)
-    print(f'A tarefa "{tarefa_removida["titulo"]}" foi removida!')
+        tarefa_removida = lista_tarefas.pop(int(indice_tarefa) - 1)
+        arquivo.escrever_arquivo(lista_tarefas)
+        print(f'A tarefa "{tarefa_removida["titulo"]}" foi removida!')
+        return

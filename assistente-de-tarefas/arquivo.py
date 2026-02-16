@@ -2,8 +2,8 @@ import json
 
 
 def escrever_arquivo(tarefa_ou_lista):
-    lista_tarefas_arquivo = ler_arquivo()
     if isinstance(tarefa_ou_lista, dict):
+        lista_tarefas_arquivo = ler_arquivo()
         lista_tarefas_arquivo.append(tarefa_ou_lista)
     else:
         lista_tarefas_arquivo = tarefa_ou_lista
