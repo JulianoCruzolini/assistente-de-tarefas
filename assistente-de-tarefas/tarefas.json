@@ -1,1 +1,37 @@
-[]
+[
+    {
+        "titulo": "Caminhar amanhã",
+        "prioridade": "baixa",
+        "situacao": "em progresso"
+    },
+    {
+        "titulo": "Estudar Python a vida inteira",
+        "prioridade": "alta",
+        "situacao": "pendente"
+    },
+    {
+        "titulo": "Correr",
+        "prioridade": "media",
+        "situacao": "pendente"
+    },
+    {
+        "titulo": "Jogar videogame",
+        "prioridade": "alta",
+        "situacao": "pendente"
+    },
+    {
+        "titulo": "Passear no parque",
+        "prioridade": "media",
+        "situacao": "pendente"
+    },
+    {
+        "titulo": "Aprender mais sobre IA",
+        "prioridade": "alta",
+        "situacao": "pendente"
+    },
+    {
+        "titulo": "Fazer as unhas",
+        "prioridade": "baixa",
+        "situacao": "pendente"
+    }
+]

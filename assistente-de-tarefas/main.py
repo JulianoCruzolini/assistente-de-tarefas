@@ -1,4 +1,5 @@
 import menu
+import ia_helper
 import utils
 utils.limpar_tela()
 
@@ -9,8 +10,11 @@ lista_opcoes = [
     {"nome": "avançar situação", "funcao": menu.avancar},
     {"nome": "contar situação das tarefas", "funcao": menu.contar_situacoes},
     {"nome": "buscar tarefas", "funcao": menu.buscar},
+    {"nome": "modoIA", "funcao": ia_helper.modo_ia},
 ]
-
+testando1 = None
+testando2 = "Batata"
+print(testando1 or testando2)
 while True:
     opcao_desejada = menu.perguntar_opcoes_e_retornar_opcao(lista_opcoes)
     if utils.checar_sair(opcao_desejada):
